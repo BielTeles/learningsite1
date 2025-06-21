@@ -85,6 +85,55 @@ Esse projeto me ensinou muito sobre:
 - **Acessibilidade na prática** - fazer web para todos
 - **Next.js avançado** - Server Components, lazy loading, otimizações
 
+## 🚀 Como Executar
+
+### **Desenvolvimento Local**
+```bash
+# Clone o repositório
+git clone https://github.com/bielteles/learningsite1.git
+cd learningsite1
+
+# Instale as dependências
+npm install
+
+# Execute em modo de desenvolvimento
+npm run dev
+```
+
+### **Deploy para GitHub Pages**
+```bash
+# Build e export estático
+npm run build
+
+# Ou use o comando combinado
+npm run deploy
+```
+
+### **Setup Automático**
+```bash
+# Linux/Mac
+bash setup-git.sh
+
+# Windows PowerShell
+.\setup-git.ps1
+```
+
+### **URLs**
+- **Desenvolvimento**: http://localhost:3000
+- **Produção**: https://bielteles.github.io/learningsite1/
+
+## 📋 Deploy Automático
+
+O site está configurado para deploy automático via **GitHub Actions**:
+
+1. ✅ **Push para main** → Deploy automático
+2. ✅ **Export estático** para GitHub Pages
+3. ✅ **Cache inteligente** para builds rápidos
+4. ✅ **Otimizações automáticas** de assets
+
+Ver detalhes completos em [`DEPLOY.md`](./DEPLOY.md)
+
+---
 
 **Feito com ❤️ e muito ☕ para demonstrar habilidades reais de desenvolvimento moderno.**
 

@@ -1,85 +1,41 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === 'production';
+const isGithubPages = process.env.GITHUB_ACTIONS === 'true';
+
 const nextConfig: NextConfig = {
-  // Performance optimizations
-  experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
-    scrollRestoration: true,
+  // Enable static export for GitHub Pages
+  output: 'export',
+  
+  // Disable image optimization for static export
+  images: {
+    unoptimized: true,
   },
   
-  // Image optimization
-  images: {
-    formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
-    dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  // Set base path for GitHub Pages
+  basePath: isGithubPages ? '/learningsite1' : '',
+  assetPrefix: isGithubPages ? '/learningsite1/' : '',
+  
+  // Ensure trailing slash for GitHub Pages
+  trailingSlash: true,
+  
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+  experimental: {
+    // Performance optimizations
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    
+    // Improved performance optimizations
+    scrollRestoration: true,
   },
 
   // Compression
   compress: true,
 
-  // Headers for performance and security
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=3600, must-revalidate',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-        ],
-      },
-      {
-        source: '/fonts/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-    ];
-  },
-
-  // Redirects and rewrites
-  async redirects() {
-    return [
-      {
-        source: '/home',
-        destination: '/',
-        permanent: true,
-      },
-    ];
-  },
-
-  // Bundle analyzer in development
-  webpack: (config, { dev, isServer }) => {
-    return config;
-  },
-  
   // Disable x-powered-by header
   poweredByHeader: false,
 
