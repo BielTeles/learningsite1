@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Host
+Host: https://techcorp.com
+
+# Sitemaps
+Sitemap: https://techcorp.com/sitemap.xml 
