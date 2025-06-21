@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "export": "next build",
+    "build:deploy": "node scripts/build-for-deploy.js",
     "check-deploy": "node scripts/check-deploy.js"
   },
   "dependencies": {

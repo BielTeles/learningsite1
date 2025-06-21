@@ -47,10 +47,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
 
-      - name: Build with Next.js
-        run: npm run build
-        env:
-          NODE_ENV: production
+      - name: Build with custom script
+        run: npm run build:deploy
+
+      - name: Debug - List build output
+        run: |
+          echo "Checking build output..."
+          ls -la
+          if [ -d "out" ]; then
+            echo "✅ out directory exists"
+            ls -la out/
+          else
+            echo "❌ out directory not found"
+            if [ -d ".next" ]; then
+              echo "Found .next directory instead:"
+              ls -la .next/
+            fi
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
