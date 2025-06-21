@@ -53,20 +53,52 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
+      - name: Debug environment
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Next.js version: $(npx next --version)"
+          echo "Environment variables:"
+          env | grep -E "(GITHUB|NODE)" || true
+          
+      - name: Debug Next.js config
+        run: |
+          echo "Next.js configuration:"
+          cat next.config.ts
+          
       - name: Build with Next.js
-        run: npm run build
+        run: |
+          echo "Starting build process..."
+          npm run build
+          echo "Build completed."
+        env:
+          NODE_ENV: production
+          GITHUB_ACTIONS: true
         
       - name: Verify build output
         run: |
           echo "Build completed. Checking output..."
           pwd
+          echo "Root directory contents:"
           ls -la
+          echo "Checking for .next directory:"
+          if [ -d ".next" ]; then
+            echo "✅ .next directory exists"
+            ls -la .next/
+          else
+            echo "❌ .next directory not found"
+          fi
+          echo "Checking for out directory:"
           if [ -d "out" ]; then
             echo "✅ out directory exists"
             echo "Contents of out directory:"
             ls -la out/
+            echo "Total size of out directory:"
+            du -sh out/
           else
             echo "❌ out directory not found"
+            echo "Let's check if there are any build artifacts:"
+            find . -name "*.html" -o -name "*.js" -o -name "*.css" | head -20
             exit 1
           fi
         

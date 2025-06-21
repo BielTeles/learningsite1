@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
   
   // Set base path for GitHub Pages
   basePath: isGithubPages ? '/learningsite1' : '',
-  assetPrefix: isGithubPages ? '/learningsite1/' : '',
+  assetPrefix: isGithubPages ? '/learningsite1' : '',
   
   // Ensure trailing slash for GitHub Pages
   trailingSlash: true,
@@ -25,40 +25,14 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  experimental: {
-    // Performance optimizations
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
-    
-    // Improved performance optimizations
-    scrollRestoration: true,
+  
+  // Performance optimizations
+  compiler: {
+    removeConsole: isProd,
   },
-
-  // Compression
-  compress: true,
 
   // Disable x-powered-by header
   poweredByHeader: false,
-
-  // Generate build ID for better caching
-  generateBuildId: async () => {
-    return `build-${Date.now()}`;
-  },
-
-  // Bundle analyzer in production
-  ...(process.env.ANALYZE === 'true' && {
-    webpack: (config: any) => {
-      if (process.env.NODE_ENV === 'production') {
-        const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-        config.plugins.push(
-          new BundleAnalyzerPlugin({
-            analyzerMode: 'static',
-            openAnalyzer: false,
-          })
-        );
-      }
-      return config;
-    },
-  }),
 };
 
 export default nextConfig;
