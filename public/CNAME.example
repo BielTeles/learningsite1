@@ -1,0 +1,7 @@
+# Exemplo de configuração de domínio personalizado
+# Para usar um domínio personalizado:
+# 1. Renomeie este arquivo para 'CNAME' (sem extensão)
+# 2. Substitua o conteúdo abaixo pelo seu domínio
+# 3. Configure o DNS do seu domínio apontando para GitHub Pages
+
+# seudominio.com 
