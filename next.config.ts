@@ -1,15 +1,23 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === 'production';
+const isGitHubPages = process.env.GITHUB_PAGES === 'true';
+
 const nextConfig: NextConfig = {
   // Enable static export for GitHub Pages
   output: 'export',
   trailingSlash: true,
-  distDir: 'out',
   
   // Image optimization (disabled for static export)
   images: {
     unoptimized: true,
   },
+  
+  // Conditional base path for GitHub Pages
+  ...(isGitHubPages && {
+    basePath: '/learningsite1',
+    assetPrefix: '/learningsite1/',
+  }),
   
   // Performance optimizations
   experimental: {
@@ -20,10 +28,7 @@ const nextConfig: NextConfig = {
   // Disable x-powered-by header
   poweredByHeader: false,
   
-  // Ensure proper asset handling for static export
-  assetPrefix: '',
-  
-  // Disable ISR and other server features for static export
+  // TypeScript and ESLint settings
   typescript: {
     // Dangerously allow production builds to successfully complete even if
     // your project has type errors.

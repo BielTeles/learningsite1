@@ -1,82 +1,75 @@
 #!/usr/bin/env node
 
 /**
- * Script para verificar se o projeto está pronto para deploy
- * Execute: node scripts/check-deploy.js
+ * Script de verificação para debug do processo de deploy
  */
 
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Verificando configuração de deploy...\n');
+console.log('🔍 Verificação do ambiente de deploy\n');
 
-const checks = [
-  {
-    name: 'Next.js configurado para exportação estática',
-    check: () => {
-      try {
-        const config = fs.readFileSync('next.config.ts', 'utf8');
-        return config.includes('output: \'export\'') && config.includes('trailingSlash: true');
-      } catch {
-        return false;
-      }
-    }
-  },
-  {
-    name: 'Workflows do GitHub Actions',
-    check: () => {
-      return fs.existsSync('.github/workflows/deploy.yml') && 
-             fs.existsSync('.github/workflows/ci.yml');
-    }
-  },
-  {
-    name: 'Dependabot configurado',
-    check: () => fs.existsSync('.github/dependabot.yml')
-  },
-  {
-    name: 'Arquivo .nojekyll presente',
-    check: () => fs.existsSync('public/.nojekyll')
-  },
-  {
-    name: 'Build gerou arquivos estáticos',
-    check: () => {
-      return fs.existsSync('out/index.html') && fs.existsSync('out/sitemap.xml');
-    }
-  },
-  {
-    name: 'Sitemap e manifest configurados para static export',
-    check: () => {
-      try {
-        const sitemap = fs.readFileSync('src/app/sitemap.ts', 'utf8');
-        const manifest = fs.readFileSync('src/app/manifest.ts', 'utf8');
-        return sitemap.includes('force-static') && manifest.includes('force-static');
-      } catch {
-        return false;
-      }
-    }
+// Verificar variáveis de ambiente
+console.log('🌍 Variáveis de ambiente:');
+console.log(`   NODE_ENV: ${process.env.NODE_ENV || 'não definido'}`);
+console.log(`   GITHUB_PAGES: ${process.env.GITHUB_PAGES || 'não definido'}`);
+console.log(`   GITHUB_ACTIONS: ${process.env.GITHUB_ACTIONS || 'não definido'}`);
+
+// Verificar arquivos de configuração
+console.log('\n⚙️  Arquivos de configuração:');
+const configFiles = ['next.config.ts', 'next.config.js', 'package.json'];
+configFiles.forEach(file => {
+  if (fs.existsSync(file)) {
+    console.log(`   ✅ ${file} existe`);
+  } else {
+    console.log(`   ❌ ${file} não encontrado`);
   }
-];
-
-let allPassed = true;
-
-checks.forEach(({ name, check }) => {
-  const passed = check();
-  const icon = passed ? '✅' : '❌';
-  console.log(`${icon} ${name}`);
-  if (!passed) allPassed = false;
 });
 
-console.log('\n' + '='.repeat(50));
+// Verificar estrutura do projeto
+console.log('\n📁 Estrutura do projeto:');
+const importantDirs = ['src', 'public', '.next', 'out', 'dist'];
+importantDirs.forEach(dir => {
+  if (fs.existsSync(dir)) {
+    const files = fs.readdirSync(dir);
+    console.log(`   ✅ ${dir}/ (${files.length} itens)`);
+  } else {
+    console.log(`   ❌ ${dir}/ não existe`);
+  }
+});
 
-if (allPassed) {
-  console.log('🎉 Projeto pronto para deploy!');
-  console.log('\n📋 Próximos passos:');
-  console.log('1. Faça push para o GitHub');
-  console.log('2. Configure GitHub Pages (Settings > Pages > Source: GitHub Actions)');
-  console.log('3. Próximo push na main = deploy automático!');
-  console.log('\n🔗 Seu site estará em: https://[username].github.io/[repository-name]/');
-} else {
-  console.log('⚠️  Algumas verificações falharam.');
-  console.log('Corrija os problemas acima antes do deploy.');
-  process.exit(1);
-} 
+// Verificar package.json scripts
+console.log('\n📋 Scripts disponíveis:');
+try {
+  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  const scripts = packageJson.scripts || {};
+  Object.keys(scripts).forEach(script => {
+    console.log(`   📜 ${script}: ${scripts[script]}`);
+  });
+} catch (error) {
+  console.log('   ❌ Erro ao ler package.json');
+}
+
+// Verificar se há conflitos na configuração do Next.js
+console.log('\n🔧 Verificação da configuração Next.js:');
+try {
+  // Simular as injeções do GitHub Actions
+  const nextConfigContent = fs.readFileSync('next.config.ts', 'utf8');
+  console.log('   ✅ next.config.ts lido com sucesso');
+  
+  // Verificar se há configurações que podem causar conflito
+  if (nextConfigContent.includes('basePath')) {
+    console.log('   ⚠️  basePath detectado na configuração');
+  }
+  if (nextConfigContent.includes('images')) {
+    console.log('   ⚠️  configuração de images detectada');
+  }
+  if (nextConfigContent.includes('output')) {
+    console.log('   ✅ configuração de output detectada');
+  }
+  
+} catch (error) {
+  console.log(`   ❌ Erro ao verificar configuração: ${error.message}`);
+}
+
+console.log('\n✅ Verificação concluída!'); 

@@ -20,6 +20,9 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
+      GITHUB_PAGES: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,11 +36,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        with:
-          static_site_generator: next
-
       - name: Restore cache
         uses: actions/cache@v4
         with:
@@ -49,6 +47,9 @@ jobs:
 
       - name: Build with custom script
         run: npm run build:deploy
+        env:
+          NODE_ENV: production
+          GITHUB_PAGES: true
 
       - name: Debug - List build output
         run: |
@@ -56,11 +57,16 @@ jobs:
           ls -la
           if [ -d "out" ]; then
             echo "✅ out directory exists"
+            echo "Contents of out directory:"
             ls -la out/
+            echo "First few files in out:"
+            find out -type f | head -10
           else
             echo "❌ out directory not found"
+            echo "Available directories:"
+            ls -la
             if [ -d ".next" ]; then
-              echo "Found .next directory instead:"
+              echo "Found .next directory:"
               ls -la .next/
             fi
           fi
