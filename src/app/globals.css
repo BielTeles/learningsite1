@@ -1,30 +1,3 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -82,6 +55,7 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
   }
 }
 
@@ -200,18 +174,17 @@ html {
 }
 
 .hover-lift:hover {
-  transform: translateY(-2px) translateZ(0);
+  transform: translateY(-2px);
 }
 
-/* Glass effect with better performance */
 .glass {
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Loading states */
 .loading-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -225,7 +198,6 @@ html {
   }
 }
 
-/* Intersection observer optimization */
 .intersection-observed {
   opacity: 0;
   transform: translateY(20px);
