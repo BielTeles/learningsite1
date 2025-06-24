@@ -1,4 +1,4 @@
-name: Deploy Next.js to GitHub Pages
+name: Deploy Next.js to GitHub Pages with Quality Checks
 
 on:
   push:
@@ -17,9 +17,41 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Quality Check job
+  quality-check:
+    runs-on: ubuntu-latest
+    name: Code Quality & Linting
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript Type Check
+        run: npm run type-check
+
+      - name: ESLint Check (Strict - Zero Warnings)
+        run: npm run lint:strict
+
+      - name: Cache ESLint results
+        uses: actions/cache@v4
+        with:
+          path: .eslintcache
+          key: ${{ runner.os }}-eslint-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+          restore-keys: |
+            ${{ runner.os }}-eslint-
+
   # Build job
   build:
     runs-on: ubuntu-latest
+    needs: quality-check
     env:
       NODE_ENV: production
       GITHUB_PAGES: true
@@ -36,7 +68,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Restore cache
+      - name: Restore Next.js cache
         uses: actions/cache@v4
         with:
           path: |
@@ -45,31 +77,65 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
 
-      - name: Build with custom script
+      - name: Build with quality checks
         run: npm run build:deploy
         env:
           NODE_ENV: production
           GITHUB_PAGES: true
 
-      - name: Debug - List build output
+      - name: Validate build output
         run: |
-          echo "Checking build output..."
-          ls -la
-          if [ -d "out" ]; then
-            echo "✅ out directory exists"
-            echo "Contents of out directory:"
-            ls -la out/
-            echo "First few files in out:"
-            find out -type f | head -10
-          else
+          echo "🔍 Validating build output..."
+          
+          # Check if out directory exists
+          if [ ! -d "out" ]; then
             echo "❌ out directory not found"
-            echo "Available directories:"
-            ls -la
-            if [ -d ".next" ]; then
-              echo "Found .next directory:"
-              ls -la .next/
-            fi
+            exit 1
           fi
+          
+          # Check essential files
+          if [ ! -f "out/index.html" ]; then
+            echo "❌ index.html not found"
+            exit 1
+          fi
+          
+          # Check for .nojekyll
+          if [ ! -f "out/.nojekyll" ]; then
+            echo "❌ .nojekyll file missing"
+            exit 1
+          fi
+          
+          # List contents for debugging
+          echo "✅ Build validation successful"
+          echo "📁 Contents of out directory:"
+          ls -la out/
+          
+          # Show file sizes
+          echo "📊 Build size analysis:"
+          du -sh out/*
+          
+          # Count total files
+          TOTAL_FILES=$(find out -type f | wc -l)
+          echo "📋 Total files generated: $TOTAL_FILES"
+
+      - name: Security check on build files
+        run: |
+          echo "🔒 Running security checks..."
+          
+          # Check for sensitive files
+          if find out -name "*.env*" -o -name "*.key" -o -name "*.pem" | grep -q .; then
+            echo "❌ Sensitive files found in build output"
+            find out -name "*.env*" -o -name "*.key" -o -name "*.pem"
+            exit 1
+          fi
+          
+          # Check for console.log in production files
+          if grep -r "console\.log" out/ --exclude-dir=_next 2>/dev/null | grep -q .; then
+            echo "⚠️ console.log found in production files (this is OK for analytics)"
+            grep -r "console\.log" out/ --exclude-dir=_next | head -5
+          fi
+          
+          echo "✅ Security checks passed"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -87,4 +153,14 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4 
+        uses: actions/deploy-pages@v4
+
+      - name: Post-deployment check
+        run: |
+          echo "🚀 Deployment completed successfully!"
+          echo "🌐 Site URL: ${{ steps.deployment.outputs.page_url }}"
+          echo "✅ All quality checks passed"
+          echo "✅ ESLint: Zero warnings/errors"
+          echo "✅ TypeScript: No type errors"
+          echo "✅ Build: Static export successful"
+          echo "✅ Security: No sensitive files" 

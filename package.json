@@ -7,9 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "lint:strict": "next lint --max-warnings 0",
+    "type-check": "tsc --noEmit",
     "export": "next build",
     "build:deploy": "node scripts/build-for-deploy.js",
-    "check-deploy": "node scripts/check-deploy.js"
+    "check-deploy": "node scripts/check-deploy.js",
+    "pre-commit": "node scripts/pre-commit-checks.js",
+    "build:production": "NODE_ENV=production npm run pre-commit && npm run build"
   },
   "dependencies": {
     "@vercel/analytics": "^1.5.0",

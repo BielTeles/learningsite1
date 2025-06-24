@@ -154,22 +154,22 @@ export function Team() {
 
               {/* Social Links */}
               <div className="flex justify-center space-x-3 opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-                {member.social.linkedin && (
+                {Boolean(member.social.linkedin) && (
                   <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
                     <Linkedin className="h-4 w-4" />
                   </Button>
                 )}
-                {member.social.github && (
+                {Boolean(member.social.github) && (
                   <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
                     <Github className="h-4 w-4" />
                   </Button>
                 )}
-                {member.social.twitter && (
+                {Boolean(member.social.twitter) && (
                   <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
                     <Twitter className="h-4 w-4" />
                   </Button>
                 )}
-                {member.social.email && (
+                {Boolean(member.social.email) && (
                   <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
                     <Mail className="h-4 w-4" />
                   </Button>
