@@ -8,13 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "lint:strict": "next lint --max-warnings 0",
-    "type-check": "tsc --noEmit",
     "export": "next build",
-    "build:deploy": "node scripts/build-for-deploy.js",
-    "check-deploy": "node scripts/check-deploy.js",
-    "pre-commit": "node scripts/pre-commit-checks.js",
-    "build:production": "NODE_ENV=production npm run pre-commit && npm run build"
+    "type-check": "tsc --noEmit",
+    "build:deploy": "npm run type-check && npm run lint && npm run build",
+    "clean": "rm -rf .next out"
   },
   "dependencies": {
     "@vercel/analytics": "^1.5.0",
@@ -29,7 +26,6 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -38,6 +34,6 @@
     "eslint-config-next": "15.3.4",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3"
+    "typescript": "^5.6.3"
   }
 }
